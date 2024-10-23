@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tcu.cs.hogwarts_artifact_online.artifact.artifactDto.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifact_online.system.StatusCode;
+import edu.tcu.cs.hogwarts_artifact_online.system.exception.ObjectNotFoundException;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -97,13 +98,14 @@ class ArtifactControllerTest {
     void findArtifactByIdNotFound() throws Exception {
 
         //Given
-        given(artifactService.findById("7654321")).willThrow(new ArtifactNotFoundException("could not find id 7654321"));
+        given(artifactService.findById("7654321"))
+                .willThrow(new ObjectNotFoundException("Chrono-Glasses of Time ", "7654321"));
         //When
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/artifacts/{id}", "7654321").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.flag").value(false))
                 .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
-                .andExpect(jsonPath("$.message").value("Could not find artifact with the id"))
+                .andExpect(jsonPath("$.message").value("Could not find Chrono-Glasses of Time  with the id 7654321"))
                 .andExpect(jsonPath("$.data").isEmpty());
     }
     @Test
@@ -196,17 +198,18 @@ class ArtifactControllerTest {
         String json = this.objectMapper.writeValueAsString(artifactDto);//converting the dto to json
 //creating fake data that artifactService will return when the saved method in it is invoked
 
-        given(this.artifactService.update(eq("87654321"), Mockito.any(Artifact.class))).willThrow(new ArtifactNotFoundException("87654321"));
+        given(this.artifactService.update(eq("87654321"), Mockito.any(Artifact.class)))
+                .willThrow(new ObjectNotFoundException(" Eldritch Amulet of Elarion", "87654321"));
 
         //When and Then
         this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/artifacts/87654321").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.flag").value(false))
                 .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
-                .andExpect(jsonPath("$.message").value("Could not find artifact with the id"))
+                .andExpect(jsonPath("$.message").value("Could not find  Eldritch Amulet of Elarion with the id 87654321"))
                 .andExpect(jsonPath("$.data").isEmpty());
     }
     @Test
-    void testDeleteArtifactSucsess() throws Exception {
+    void testDeleteArtifactSuccess() throws Exception {
         //Given
         doNothing().when(this.artifactService).delete("87654321");
         //When and Then
@@ -219,11 +222,11 @@ class ArtifactControllerTest {
     @Test
     void testDeleteNotFound() throws Exception {
         //Given
-        doThrow(new ArtifactNotFoundException("87654321")).when(this.artifactService).delete("87654321");        //When and Then
+        doThrow(new ObjectNotFoundException(" Eldritch Amulet of Elarion", "87654321")).when(this.artifactService).delete("87654321");        //When and Then
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/artifacts/87654321").accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.flag").value(false))
                 .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
-                .andExpect(jsonPath("$.message").value("Could not find artifact with the id"))
+                .andExpect(jsonPath("$.message").value("Could not find  Eldritch Amulet of Elarion with the id 87654321"))
                 .andExpect(jsonPath("$.data").isEmpty());
     }
 

@@ -5,6 +5,7 @@ import edu.tcu.cs.hogwarts_artifact_online.artifact.converter.ArtifactDtoToArtif
 import edu.tcu.cs.hogwarts_artifact_online.artifact.converter.ArtifactToArtifactDtoConverter;
 import edu.tcu.cs.hogwarts_artifact_online.system.Result;
 import edu.tcu.cs.hogwarts_artifact_online.system.StatusCode;
+import edu.tcu.cs.hogwarts_artifact_online.wizard.WizardDto;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,4 +59,5 @@ public class ArtifactController {
         this.artifactService.delete(artifactId);
         return new Result(true, StatusCode.SUCCESS,"Delete success");
     }
+
 }

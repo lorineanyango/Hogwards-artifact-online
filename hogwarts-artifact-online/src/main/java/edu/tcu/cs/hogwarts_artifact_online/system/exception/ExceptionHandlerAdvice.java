@@ -1,6 +1,5 @@
 package edu.tcu.cs.hogwarts_artifact_online.system.exception;
 
-import edu.tcu.cs.hogwarts_artifact_online.artifact.ArtifactNotFoundException;
 import edu.tcu.cs.hogwarts_artifact_online.system.Result;
 import edu.tcu.cs.hogwarts_artifact_online.system.StatusCode;
 import org.springframework.http.HttpStatus;
@@ -19,14 +18,14 @@ import java.util.Map;
 @RestControllerAdvice
 public class ExceptionHandlerAdvice {
 
-    @ExceptionHandler(ArtifactNotFoundException.class)// it is used to tell spring that the method is an exception handler, and you have to add a value to it,you pass the class that is being handled
+    @ExceptionHandler(ObjectNotFoundException.class)// it is used to tell spring that the method is an exception handler, and you have to add a value to it,you pass the class that is being handled
     @ResponseStatus(HttpStatus.NOT_FOUND)//shows the status of the method
-    Result handleArtifactNotFoundException (ArtifactNotFoundException ex){
+    Result handleObjectNotFoundException (ObjectNotFoundException ex){
         return new Result(false, StatusCode.NOT_FOUND,ex.getMessage(),null);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    Result handleVlidation(MethodArgumentNotValidException ex){
+    Result handleValidation(MethodArgumentNotValidException ex){
         List<ObjectError> errors = ex.getBindingResult().getAllErrors();
         Map<String,String> map = new HashMap<>(errors.size());
         errors.forEach((error)->{
