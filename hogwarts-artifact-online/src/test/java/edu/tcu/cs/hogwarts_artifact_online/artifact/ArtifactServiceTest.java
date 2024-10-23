@@ -1,6 +1,7 @@
 package edu.tcu.cs.hogwarts_artifact_online.artifact;
 
 import edu.tcu.cs.hogwarts_artifact_online.artifact.util.IdWorker;
+import edu.tcu.cs.hogwarts_artifact_online.system.exception.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifact_online.wizard.Wizard;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -95,7 +96,7 @@ class ArtifactServiceTest {
             Artifact returnedArtifact = artifactService.findById("12345678");
         });
         //Then
-        assertThat(thrown).isInstanceOf(ArtifactNotFoundException.class).hasMessage("Could not find artifact with the id");
+            assertThat(thrown).isInstanceOf(ObjectNotFoundException.class).hasMessage("Could not find Artifact with the id 12345678");
         verify(artifactRepository,times(1)).findById("12345678"); //ensures that the artifact repository with the id is called once
 
     }
@@ -149,7 +150,7 @@ class ArtifactServiceTest {
         //When
         Artifact updatedArtifact = this.artifactService.update("12345678", update);
         //Then
-        assertThat(updatedArtifact.getId()).isEqualTo(update.getId());
+        assertThat(updatedArtifact.getId()).isEqualTo("12345678");
         assertThat(updatedArtifact.getDescription()).isEqualTo(update.getDescription());
         verify(artifactRepository, times(1)).findById("12345678");
         verify(artifactRepository,times(1)).save(oldArtifact);
@@ -165,7 +166,7 @@ class ArtifactServiceTest {
 
         given(this.artifactRepository.findById("12345678")).willReturn(Optional.empty());
         //When
-        assertThrows(ArtifactNotFoundException.class, ()->{
+        assertThrows(ObjectNotFoundException.class, ()->{
             artifactService.update("12345678", update);
         });
         //Then
@@ -193,7 +194,7 @@ class ArtifactServiceTest {
         //Given
         given(this.artifactRepository.findById("12345678")).willReturn(Optional.empty()); //first find by the id
         //When
-        assertThrows(ArtifactNotFoundException.class, ()->artifactService.delete("12345678"));
+        assertThrows(ObjectNotFoundException.class, ()->artifactService.delete("12345678"));
         //Then
         verify(this.artifactRepository, times(1)).findById("12345678");
     }

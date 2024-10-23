@@ -1,10 +1,7 @@
 package edu.tcu.cs.hogwarts_artifact_online.wizard;
 
 import edu.tcu.cs.hogwarts_artifact_online.artifact.Artifact;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import org.hibernate.engine.internal.Cascade;
 
 import java.util.ArrayList;
@@ -13,6 +10,7 @@ import java.util.List;
 public class Wizard {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String name;
 
@@ -54,5 +52,10 @@ public class Wizard {
 
     public Integer getNumberOfArtifacts() {
         return this.artifacts.size();
+    }
+
+    public void removeAllArtifact() {
+        this.artifacts.forEach(artifact -> artifact.setOwner(null));
+        this.artifacts = null;
     }
 }
