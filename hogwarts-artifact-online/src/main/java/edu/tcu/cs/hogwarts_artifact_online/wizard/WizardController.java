@@ -1,5 +1,6 @@
 package edu.tcu.cs.hogwarts_artifact_online.wizard;
 
+import edu.tcu.cs.hogwarts_artifact_online.artifact.ArtifactRepository;
 import edu.tcu.cs.hogwarts_artifact_online.system.Result;
 import edu.tcu.cs.hogwarts_artifact_online.system.StatusCode;
 import edu.tcu.cs.hogwarts_artifact_online.wizard.converter.WizardDtoToWizardConverter;
@@ -15,11 +16,13 @@ public class WizardController {
     private final WizardService wizardService;
     private final WizardToWizardDtoConverter wizardToWizardDtoConverter;
     private final WizardDtoToWizardConverter wizardDtoToWizardConverter;
+    private final ArtifactRepository artifactRepository;
 
-    public WizardController(WizardService wizardService, WizardToWizardDtoConverter wizardToWizardDtoConverter, WizardDtoToWizardConverter wizardDtoToWizardConverter) {
+    public WizardController(WizardService wizardService, WizardToWizardDtoConverter wizardToWizardDtoConverter, WizardDtoToWizardConverter wizardDtoToWizardConverter, ArtifactRepository artifactRepository) {
         this.wizardService = wizardService;
         this.wizardToWizardDtoConverter = wizardToWizardDtoConverter;
         this.wizardDtoToWizardConverter = wizardDtoToWizardConverter;
+        this.artifactRepository = artifactRepository;
     }
 
 
@@ -44,16 +47,21 @@ public class WizardController {
        WizardDto savedDto = this.wizardToWizardDtoConverter.convert(savedWizard);
         return new Result(true, StatusCode.SUCCESS,"Wizard saved", savedDto);
     }
-    @PutMapping("/api/v1/wizard/{wizardId}")
+    @PutMapping("/api/v1/wizards/{wizardId}")
     Result updateWizard(@PathVariable Integer wizardId, @Valid @RequestBody WizardDto updatedWizardDto){
         Wizard update = this.wizardDtoToWizardConverter.convert(updatedWizardDto);
         Wizard updatedWizard = this.wizardService.update(wizardId,update);
         WizardDto updatedDto = this.wizardToWizardDtoConverter.convert(updatedWizard);
         return new Result(true,StatusCode.SUCCESS,"Wizard updated", updatedDto);
     }
-    @DeleteMapping("/api/v1/wizard/{wizardId}")
+    @DeleteMapping("/api/v1/wizards/{wizardId}")
     Result deleteWizard(@PathVariable Integer wizardId){
         this.wizardService.delete(wizardId);
         return new Result(true, StatusCode.SUCCESS, "Delete Success");
+    }
+    @PutMapping("/api/v1/wizards/{wizardId}/artifacts/{artifactId}")
+    public Result assignArtifacts(@PathVariable Integer wizardId, @PathVariable String artifactId){
+        this.wizardService.assignArtifact(wizardId,artifactId);
+        return new Result(true, StatusCode.SUCCESS,"Artifact assignment success");
     }
 }

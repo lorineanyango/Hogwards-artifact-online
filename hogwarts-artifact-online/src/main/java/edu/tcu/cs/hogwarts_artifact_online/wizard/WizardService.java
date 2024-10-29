@@ -1,5 +1,7 @@
 package edu.tcu.cs.hogwarts_artifact_online.wizard;
 
+import edu.tcu.cs.hogwarts_artifact_online.artifact.Artifact;
+import edu.tcu.cs.hogwarts_artifact_online.artifact.ArtifactRepository;
 import edu.tcu.cs.hogwarts_artifact_online.artifact.util.IdWorker;
 import edu.tcu.cs.hogwarts_artifact_online.system.exception.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
@@ -9,10 +11,12 @@ import java.util.List;
 @Service
 public class WizardService {
     private final WizardRepository wizardRepository;
+    private final ArtifactRepository artifactRepository;
     private final IdWorker idWorker;
 
-    public WizardService(WizardRepository wizardRepository, IdWorker idWorker) {
+    public WizardService(WizardRepository wizardRepository, ArtifactRepository artifactRepository, IdWorker idWorker) {
         this.wizardRepository = wizardRepository;
+        this.artifactRepository = artifactRepository;
         this.idWorker = idWorker;
     }
 
@@ -40,5 +44,18 @@ public class WizardService {
                 .orElseThrow(()-> new ObjectNotFoundException("Wizard",wizardId)); // this part helps to find the artifact first by id and if not found we throw an exception
         wizardToBeDeleted.removeAllArtifact();// we remove the artifact the wizard was owning
         this.wizardRepository.deleteById(wizardId); //after finding we delete by id
+    }
+    public void assignArtifact(Integer wizardId, String artifactId){
+        //Find artifact by id
+        Artifact artifactToBeAssigned = this.artifactRepository.findById(artifactId).orElseThrow(()-> new ObjectNotFoundException("Artifact", artifactId));
+
+        //Find wizard by id
+        Wizard wizard = this.wizardRepository.findById(wizardId).orElseThrow(()-> new ObjectNotFoundException("Wizard", wizardId));
+
+        //AssignArtifact
+        if (artifactToBeAssigned.getOwner() != null){
+            artifactToBeAssigned.getOwner().removeArtifact(artifactToBeAssigned);
+        }
+        wizard.addArtifact(artifactToBeAssigned);
     }
 }

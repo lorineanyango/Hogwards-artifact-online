@@ -1,6 +1,7 @@
 package edu.tcu.cs.hogwarts_artifact_online.wizard;
 
 import edu.tcu.cs.hogwarts_artifact_online.artifact.Artifact;
+import edu.tcu.cs.hogwarts_artifact_online.artifact.ArtifactRepository;
 import edu.tcu.cs.hogwarts_artifact_online.artifact.util.IdWorker;
 import edu.tcu.cs.hogwarts_artifact_online.system.exception.ObjectNotFoundException;
 import org.junit.jupiter.api.AfterEach;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,6 +29,9 @@ import static org.mockito.Mockito.verify;
 class WizardServiceTest {
     @Mock
     WizardRepository wizardRepository;
+
+    @Mock
+    ArtifactRepository artifactRepository;
     @Mock
     IdWorker idWorker;
 
@@ -114,5 +119,70 @@ class WizardServiceTest {
         //Then
         assertThat(thrown).isInstanceOf(ObjectNotFoundException.class).hasMessage("Could not find Wizard with the id " + 1);
         verify(wizardRepository, times(1)).findById(1); //ensures that the artifact repository with the id is called once
+    }
+    @Test
+    void testAssignArtifactSuccess(){
+        //Given
+        Artifact a = new Artifact();
+        a.setId("12345678");
+        a.setName("Invisibility belt");
+        a.setDescription("When the user turns it on it make the user invisible by creating a layer that is invisible");
+        a.setImageUrl("ImageUrl");
+
+        Wizard w2 = new Wizard();
+        w2.setId(2);
+        w2.setName("John");
+        w2.addArtifact(a);
+
+        Wizard w3 = new Wizard();
+        w3.setId(3);
+        w3.setName("Harry");
+
+
+        given(this.artifactRepository.findById("12345678")).willReturn(Optional.of(a));
+        given(this.wizardRepository.findById(3)).willReturn(Optional.of(w3));
+        //When
+        this.wizardService.assignArtifact(3, "12345678");
+        //Then
+        assertThat(a.getOwner().getId()).isEqualTo(3);
+        assertThat(w3.getArtifacts()).contains(a);
+    }
+    @Test
+    void testAssignArtifactErrorWithNoWizardId(){
+        //Given
+        Artifact a = new Artifact();
+        a.setId("12345678");
+        a.setName("Invisibility belt");
+        a.setDescription("When the user turns it on it make the user invisible by creating a layer that is invisible");
+        a.setImageUrl("ImageUrl");
+
+        Wizard w2 = new Wizard();
+        w2.setId(2);
+        w2.setName("John");
+        w2.addArtifact(a);
+
+
+        given(this.artifactRepository.findById("12345678")).willReturn(Optional.of(a));
+        given(this.wizardRepository.findById(3)).willReturn(Optional.empty());
+        //When
+        Throwable thrown = assertThrows(ObjectNotFoundException.class, ()->{
+            this.wizardService.assignArtifact(3, "12345678");
+        });
+        //Then
+        assertThat(thrown)
+                .isInstanceOf(ObjectNotFoundException.class)
+                        .hasMessage("Could not find Wizard with the id 3");
+        assertThat(a.getOwner().getId()).isEqualTo(2);
+
+    }
+    @Test
+    void testAssignArtifactErrorWithNoArtifactId(){
+        //Given
+        given(this.artifactRepository.findById("12345678")).willReturn(Optional.empty());
+        //When
+        Throwable thrown = assertThrows(ObjectNotFoundException.class, ()-> this.wizardService.assignArtifact(3, "12345678"));
+
+        //Then
+        assertThat(thrown).isInstanceOf(ObjectNotFoundException.class).hasMessage("Could not find Artifact with the id 12345678");
     }
     }
