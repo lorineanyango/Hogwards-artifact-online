@@ -2,6 +2,8 @@ package edu.tcu.cs.hogwarts_artifact_online.system;
 
 import edu.tcu.cs.hogwarts_artifact_online.artifact.Artifact;
 import edu.tcu.cs.hogwarts_artifact_online.artifact.ArtifactRepository;
+import edu.tcu.cs.hogwarts_artifact_online.user.HogwartsUser;
+import edu.tcu.cs.hogwarts_artifact_online.user.UserRepository;
 import edu.tcu.cs.hogwarts_artifact_online.wizard.Wizard;
 import edu.tcu.cs.hogwarts_artifact_online.wizard.WizardRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -12,11 +14,14 @@ public class DBDataInitializer implements CommandLineRunner {
 
     private final ArtifactRepository artifactRepository;
     private final WizardRepository wizardRepository;
+    private final UserRepository userRepository;
 
-    public DBDataInitializer(ArtifactRepository artifactRepository, WizardRepository wizardRepository) {
+    public DBDataInitializer(ArtifactRepository artifactRepository, WizardRepository wizardRepository, UserRepository userRepository) {
         this.artifactRepository = artifactRepository;
         this.wizardRepository = wizardRepository;
+        this.userRepository = userRepository;
     }
+
 
     @Override
     public void run(String... args) throws Exception {
@@ -56,5 +61,31 @@ public class DBDataInitializer implements CommandLineRunner {
         wizardRepository.save(w1);
         wizardRepository.save(w2);
         wizardRepository.save(w3);
+
+
+        HogwartsUser u1 = new HogwartsUser();
+        u1.setId(1);
+        u1.setUsername("Lorain");
+        u1.setPassword("123456");
+        u1.setEnabled(true);
+        u1.setRoles("admin user");
+
+        HogwartsUser u2 = new HogwartsUser();
+        u2.setId(2);
+        u2.setUsername("Eric");
+        u2.setPassword("876543");
+        u2.setEnabled(true);
+        u2.setRoles("user");
+
+        HogwartsUser u3 = new HogwartsUser();
+        u3.setId(3);
+        u3.setUsername("Tom");
+        u3.setPassword("98765432");
+        u3.setEnabled(true);
+        u3.setRoles("user");
+
+        this.userRepository.save(u1);
+        this.userRepository.save(u2);
+        this.userRepository.save(u3);
     }
 }
